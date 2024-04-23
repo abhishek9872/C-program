@@ -1,0 +1,96 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct queue {
+    int size, f, r;
+    int *a;
+};
+
+void enqueue(struct queue *q, int val);
+int isfull(struct queue *q);
+int isempty(struct queue *q);
+int dequeue(struct queue *q);
+void dfs(int node, int visited[], int graph[][7]);
+
+int main() {
+    struct queue q;
+    q.size = 100;
+    q.f = q.r = 0; // Initialize front and rear to 0 for an empty queue
+
+    q.a = (int *)malloc(q.size * sizeof(int));
+
+    int i = 0;
+    int visited[7] = {0}; // Initialize all nodes as not visited
+    int a[7][7] = {
+        {0,1,1,1,0,0,0},
+        {1,0,1,0,0,0,0},
+        {1,1,0,1,1,0,0},
+        {1,0,1,0,1,0,0},
+        {0,0,1,1,0,1,1},
+        {0,0,0,0,1,0,0},
+        {0,0,0,0,1,0,0}
+    };
+
+    // Print initial node
+    printf("BFS: %d ", i);
+    visited[i] = 1; // Mark initial node as visited
+
+    // BFS
+    while (!isempty(&q)) {
+        int node = dequeue(&q);
+        for (int j = 0; j < 7; j++) {
+            if (a[node][j] == 1 && visited[j] == 0) {
+                printf("%d ", j);
+                visited[j] = 1;
+                enqueue(&q, j);
+            }
+        }
+    }
+
+    printf("\nDFS: ");
+    int visited_dfs[7] = {0};
+    dfs(0, visited_dfs, a);
+
+    free(q.a); // Free dynamically allocated memory
+    return 0;
+}
+
+void enqueue(struct queue *q, int val) {
+    if (isfull(q)) {
+        printf("This queue is full\n");
+    }
+    else {
+        q->r++;
+        q->a[q->r] = val;
+    }
+}
+
+int isfull(struct queue *q) {
+    return (q->r == q->size - 1);
+}
+
+int isempty(struct queue *q) {
+    return (q->r < q->f);
+}
+
+int dequeue(struct queue *q) {
+    if (isempty(q)) {
+        printf("Queue is empty\n");
+        return -1; // Return some error value
+    }
+    else {
+        int val = q->a[q->f];
+        q->f++;
+        return val;
+    }
+}
+
+void dfs(int node, int visited[], int graph[][7]) {
+    printf("%d ", node);
+    visited[node] = 1;
+    for (int i = 0; i < 7; i++) {
+        if (graph[node][i] == 1 && !visited[i]) {
+            dfs(i, visited, graph);
+        }
+    }
+}
